@@ -1,0 +1,523 @@
+.cpp
+#include "arithmetic.h"
+using namespace std;
+	int CheckBrackets(char* s)  // проверка скобок
+{
+	TStack<int> st(256);
+	int len = strlen(s);
+	for (int i = 0; i < len; i++)
+	{
+		if (s[i] == '(')
+			st.Push(i);
+		else if (s[i] == ')')
+		{
+			if (st.IsEmpty())
+			{
+				return 0;
+				
+				break;
+			}
+			else
+				st.Del();
+
+		}
+	}
+	if (st.IsEmpty() != 1)
+	{
+		return 0;
+		
+	}
+
+	return 1;
+}
+
+int CheckOperationsTogether(char* s) 
+{ 
+char operation[] = "+-*/"; 
+int len = strlen(s); 
+ 
+for (int i = 0; i < len-1; i++) 
+{ 
+for (int j = 0; j < 3; j++) 
+if (s[i] == operation[j]) 
+{ 
+for (int j = 0; j < 3; j++) 
+if (s[i + 1] == operation[j]) 
+{ 
+
+return 0;
+break; 
+} 
+} 
+} 
+return 1; 
+}
+
+int CheckOperandsTogether(char* s) 
+{ 
+char operand[] = "abcdefghijklmnopqrstuvwxyz"; 
+int len = strlen(s); 
+for (int i = 0; i < len - 1; i++) 
+{ 
+for (int j = 0; j < 25; j++) 
+if ((s[i] == operand[j])) 
+{ 
+return 0;
+break; 
+} 
+for (int j = 0; j < 25; j++) 
+if ((s[i] == ')') ) 
+{ 
+return 0; 
+break; 
+} 
+} 
+return 1; 
+}
+int CheckOperations(char* s)
+{
+	char operation[] = "+-*/";
+	bool res = 1;
+	int len = strlen(s);
+
+	for (int i = 0; i < 3; i++)
+	{
+		if (s[0] == operation[i])
+		{
+			
+			return 0;
+			break;
+		}
+		if (s[len - 1] == operation[i])
+		{
+			return 0;
+			break;
+		}
+	}
+	
+	return 1;
+}
+int CheckOperands(char* s)
+{
+	char operand[] = "abcdefghijklmnopqrstuvwxyz";
+	int len = strlen(s);
+	for (int i = 0; i < len - 1; i++)
+	{
+		for (int j = 0; j < 25; j++)
+		if ((s[i] == operand[j])&&(s[i + 1] == '('))
+			{
+				return 0;
+				break;
+			}
+		for (int j = 0; j < 25; j++)
+		if ((s[i] == ')') && (s[i + 1] == operand[j]))
+		{
+			return 0;
+			break;
+		}
+	}
+	return 1;
+}
+int Prior (char a )
+{
+	int res=-1;
+	switch  (a)
+	{
+	  case '=':  res = 0;
+		  break;
+	    
+	   case '(': res = 1;
+			      break;
+		case '+':
+		case '-': res = 2; 
+			      break;
+		case '*':
+		case '/': res = 3;
+			      break;
+		case '^': res = 4;
+			      break;
+	}
+	 return res;
+
+}
+int  IsOper (char a)	
+{
+	if ( ( a =='+') || ( a =='-') || ( a =='*') ||  ( a =='^') || ( a =='=') || (a== '/') ) 
+		return 1;
+	else 
+		return 0;
+}
+
+
+int  IsNumber (char a)
+{
+	if ( (a >= '0') && (a <= '9') ) 
+		return 1;
+	else
+		return 0;
+}
+void InftoPosf (char *inf) 
+{TStack<char> st_c(256);
+	char posf [1000];
+
+	int i=0,  j=0;
+	st_c.Push('=');
+
+	while ( inf[i] != '\0')
+	{
+		if ( inf[i] == '(')
+			st_c.Push ('(');
+		
+		if ( IsNumber( inf[i]) )
+		{
+			posf[j] = inf[i];
+			j++;
+		}
+
+		if ( inf[i] ==')' ) 
+		{
+			if(st_c.IsEmpty()) 
+				st_c.Push(inf[i]);
+			 
+			 char temp = st_c.Del();
+			 while ( temp != '(' )
+			 {
+				posf [j++] = temp;
+			    temp = st_c.Del();
+			 }
+		  }
+	
+	if ( IsOper (inf[i]) )
+	{
+		if(st_c.IsEmpty()) 
+			st_c.Push(inf[i]);
+		{
+		   char temp = st_c.Del();
+		    while ( Prior (inf [i]) <= Prior (temp) )
+		     {
+			   posf[j++] = temp;
+			   temp = st_c.Del();
+		     }
+
+			st_c.Push (temp);
+			st_c.Push (inf[i]);
+		}
+	}
+	i++;
+}
+
+    while( st_c.Top() != '=' )
+	
+		 posf[j++] = st_c.Del();
+	
+	posf[j++] = '\0';
+
+}
+void   GetNumber ( char *s, double &d, int &l)
+{
+	d = atof(s);
+	l=0;
+	while ( IsNumber ( s[l] ) );
+	l++;
+}
+//double  Calc ( /*char *inf*/)
+//{TStack<int> st_d(256);char inf   [1000];char posf [1000];
+//
+//	InftoPosf(inf);
+//	int i = 0;
+//    st_d.Clear();
+//
+//	while ( posf[i] != '\0')
+//	{
+//		if ( IsNumber(posf[i]) )
+//			st_d.Push (posf[i] - '0');
+//
+//		if ( IsOper(posf[i]) )
+//		{
+//			double op1,op2,res=0;
+//			op1 = st_d.Del();
+//			op2 = st_d.Del();
+//			switch ( posf[i] )
+//			{
+//			case '+' : res = op1 + op2;
+//				       break;
+//			case '-' : res = op1 - op2;
+//				       break;
+//		    case '*' :  res = op1 * op2;
+//				        break;
+//		    case '/' :  res = op1 / op2;
+//				        break;
+//			case '^' :  res = pow(op1,op2);
+//				          break;
+//			}
+//
+//			st_d.Push(res);
+//		}
+//		i++;
+//	}
+//	return st_d.Del();
+//}
+double  Calc ( /*char *inf*/)
+{TStack<double> st_d(256);char inf   [1000];char posf [1000];
+
+	InftoPosf(inf);
+	int i = 0;
+    st_d.Clear();
+
+	while ( posf[i] != '\0')
+	{
+		if ( IsNumber(posf[i]) )
+			st_d.Push (posf[i] - '0');
+
+		if ( IsOper(posf[i]) )
+		{
+			double op1,op2,res=0;
+			op1 = st_d.Del();
+			op2 = st_d.Del();
+			switch ( posf[i] )
+			{
+			case '+' : res = op1 + op2;
+				       break;
+			case '-' : res = op1 - op2;
+				       break;
+		    case '*' :  res = op1 * op2;
+				        break;
+		    case '/' :  res = op1 / op2;
+				        break;
+			case '^' :  res = pow(op1,op2);
+				          break;
+			}
+
+			st_d.Push(res);
+		}
+		i++;
+	}
+	return st_d.Del();
+}
+
+double Calc2 (/*char *inf*/)
+{
+TStack<double> st_d(256);TStack<char> st_c(256);char inf   [1000];
+	int i=0;
+	st_d.Clear();
+	st_c.Push ( '=' );
+	while ( inf[i] != '\0' )
+	{
+		if ( IsNumber ( inf[i]) )
+		{
+			double d;
+			int l;
+			GetNumber ( & inf[i], d, l);
+			st_d.Push(d);
+			i+= l-1;
+		}
+
+			if ( inf[i] == '(' )
+				st_c.Push( '(' );
+			
+			if ( inf[i] == ')' )
+			{
+				char temp = st_c.Del();
+		        while ( temp != '(' )
+		        {
+			     double op1, op2, res;
+			     op2 = st_d.Del();
+			     op1 = st_d.Del();
+			      switch (temp) {
+			        case '+' : res = op1+op2;
+				               break;
+			        case '-' : res = op1 - op2;
+				               break;
+		            case '*' :  res = op1 * op2;
+				               break;
+		            case '/' :  res = pow (op1, op2);
+				               break;
+                   case '^' :  res = pow(op1,op2);
+				          break;
+			    }
+			st_d.Push (res);
+			temp = st_c.Del();
+		       } 
+		}
+		
+		if ( IsOper (inf[i])  ) 
+		{
+			char temp = st_c.Del();
+			while ( Prior (inf[i]) <= Prior (temp) )
+			{	
+			  double op1, op2,res;
+			  op2 = st_d.Del();
+			  op1 = st_d.Del();
+			   switch (temp) {
+			   case '+' : res = op1+op2;
+				       break;
+			   case '-' : res = op1 - op2;
+				       break;
+		       case '*' :  res = op1 * op2;
+				        break;
+		       case '/' :  res = op1 / op2;
+				        break;
+              case '^' :  res = pow(op1,op2);
+				          break;
+			} 
+
+			st_d.Push(res);
+			temp = st_c.Del();
+			}
+
+			i++;
+		}
+
+
+		char temp = st_c.Del();
+		while (  temp != '=' )
+		{
+			double op1, op2,res;
+			op2 = st_d.Del();
+			op1 = st_d.Del();
+			switch (temp) {
+			case '+' : res = op1+op2;
+				       break;
+			case '-' : res = op1 - op2;
+				       break;
+		    case '*' :  res = op1 * op2;
+				        break;
+		    case '/' :  res = op1 / op2;
+				        break;
+            case '^' :  res = pow(op1,op2);
+				        break;
+			}
+			return st_d.Del();
+		}
+
+}
+}
+.h
+#ifndef __ARITHMETIC_H__
+#define __ARITHMETIC_H__
+
+#include <iostream>
+#include <cctype>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string>
+#include "stack.h"
+#include "math.h"
+using namespace std;
+
+int CheckBrackets(char* s);  // проверка скобок
+int CheckOperationsTogether(char* s) ;
+int CheckOperandsTogether(char* s) ;
+int CheckOperations(char* s);
+int CheckOperands(char* s);
+int Prior (char a );
+int  IsOper (char a);
+int  IsNumber (char a);
+
+void InftoPosf (char *inf); 
+void   GetNumber ( char *s, double &d, int &l);
+double  Calc (/*char inf*/);
+double Calc2 ();
+#endif
+tests
+#include <gtest.h>
+#include "arithmetic.h"
+
+TEST(arithmetic, check_an_correctly_bracket1)
+{char s[] = "5+3*((a+b)";
+	EXPECT_EQ(0, CheckBrackets(s));
+}
+TEST(TArithmetic, check_an_correctly_bracket2)
+{
+	char s[] = "5+3*(a+b))";
+	EXPECT_EQ(0, CheckBrackets(s));
+}
+TEST(TArithmetic, check_an_correctly_bracket3)
+{
+	char s[] = "5+3*)(a+b)";
+	EXPECT_EQ(0, CheckBrackets(s));
+}
+TEST(arithmetic, check_operations_return_false_if_they_stand_together)
+{
+	char s[] =  "5+6*(a+-b)";
+	EXPECT_EQ(0, CheckOperationsTogether(s));
+}
+TEST(arithmetic, check_operands_return_false_if_they_stand_together)
+{char s[] =  "5+6*(a6-b)";
+	EXPECT_EQ(0, CheckOperandsTogether(s));
+}
+TEST(TArithmetic, check_operations_return_false_if_they_stay_before_brackets)
+{
+	char s[] = "+(5+3*(a+b))";
+	EXPECT_EQ(0, CheckOperations(s));
+}
+TEST(TArithmetic, check_operations_return_false_if_they_stay_after_brackets)
+{
+	char s[] = "(5+3*(a+b))+";
+	EXPECT_EQ(0, CheckOperations(s));
+}
+TEST(TArithmetic, check_operands_return_false_if_they_stay_after_brackets)
+{
+	char s[] = "5+3*(a+b)c";
+	EXPECT_EQ(0, CheckOperands(s));
+}
+TEST(TArithmetic, check_operands_return_false_if_they_stay_before_brackets)
+{
+	char s[] = "5+3*c(a+b)";
+	EXPECT_EQ(0, CheckOperands(s));
+}
+TEST(TArithmetic, check_prior2)
+{
+	char a='+';
+	EXPECT_EQ(2, Prior(a));
+}
+TEST(TArithmetic, check_prior0)
+{
+	char a='=';
+	EXPECT_EQ(0, Prior(a));
+}
+TEST(TArithmetic, check_prior1)
+{
+	char a='(';
+	EXPECT_EQ(1, Prior(a));
+}
+TEST(TArithmetic, check_prior3)
+{
+	char a='*';
+	EXPECT_EQ(3, Prior(a));
+}
+TEST(TArithmetic, check_prior4)
+{
+	char a='^';
+	EXPECT_EQ(4, Prior(a));
+}
+TEST(TArithmetic, check_prior5)
+{
+	char a=',';
+	EXPECT_EQ(-1, Prior(a));
+}
+TEST(TArithmetic, false_IsOper)
+{
+	char a=',';
+	EXPECT_EQ(0, IsOper(a));
+}
+TEST(TArithmetic, false_IsNumber )
+{
+	char a=',';
+	EXPECT_EQ(0, IsOper(a));
+}
+
+TEST(TArithmetic, can_convert_inf_to_postf)
+{char a[]= "2+3/4*7";
+	/*char *a = "2+3/4*7";*/
+	char posf [1000];
+    InftoPosf(a);
+    
+	EXPECT_EQ( '2', posf[0] );
+	EXPECT_EQ( '3', posf[1] );
+	EXPECT_EQ( '4', posf[2] );
+	EXPECT_EQ( '/', posf[3] );
+	EXPECT_EQ( '7', posf[4] );
+	EXPECT_EQ( '*', posf[5] );
+	EXPECT_EQ( '+',posf[6] );
+}
